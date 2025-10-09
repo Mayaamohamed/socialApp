@@ -1,0 +1,7 @@
+node_modules/
+
+# تجاهل ملف البيئة الحساسة
+.env
+
+# تجاهل مجلد build أو dist لو بتعملي build
+dist/

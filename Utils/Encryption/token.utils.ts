@@ -1,0 +1,16 @@
+import jwt, { type JwtPayload, type Secret, type SignOptions, type VerifyOptions } from 'jsonwebtoken'
+export const generateToken=(
+    payload:string |Buffer|object,
+    secretOrPrivateKey :Secret =process.env.JWT_SECRET as string,
+    options?:SignOptions,
+):string=>{
+    return jwt.sign(payload,secretOrPrivateKey,options)
+}
+
+export const verifyToken=(
+    token:string,
+    secretOrPublicKey: Secret =process.env.JWT_SECRET as string,
+    options?:VerifyOptions
+):JwtPayload =>{
+    return jwt.verify(token,secretOrPublicKey,options) as JwtPayload
+}
