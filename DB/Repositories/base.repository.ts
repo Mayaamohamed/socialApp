@@ -2,7 +2,7 @@
 // core methods 
 // مش هينقع اخد instance
 // اقدر extend
-import mongoose, { Model, mongo, type FilterQuery, type ProjectionType, type QueryOptions } from "mongoose";
+import mongoose, { Model, mongo, type FilterQuery, type ProjectionType, type QueryOptions, type UpdateQuery } from "mongoose";
 
 export abstract class BaseRepository<T>{
 
@@ -18,13 +18,17 @@ export abstract class BaseRepository<T>{
      async findDocumentById(id:mongoose.Schema.Types.ObjectId,projection?:ProjectionType<T>,options?:QueryOptions<T>):Promise<T|null>{
         return  await this.model.findById(id,projection,options)
     }
-    updateOneDocument(){}
+   async updateOneDocument(filters:FilterQuery<T>,updateObject:UpdateQuery<T>,options?:QueryOptions<T>){
+        return await this.model.findOneAndUpdate()
+    }
     updateMultipleDocuments(){}
     deleteOneDocument(){}
     deleteMultipleDocument(){}
     findAndUpdateDocument(){}
     findAndDeleteDocument(){}
-    findDocuments(){}
+   async findDocuments(filters:FilterQuery<T>,projection?:ProjectionType<T>,options?:QueryOptions<T>):Promise<T[]|null>{
+    return await this.model.find(filters,projection,options)
+    } // find return array 
 
 
 }

@@ -8,7 +8,7 @@ value:String;
 expireAt:number;
 otpType:otpTypesEnums;
 }
-export interface Iuser{
+export interface Iuser extends Document{
     [x: string]: any;
     firstName:string;
     lastName:string;
@@ -37,5 +37,9 @@ export interface Iuser{
 }
 
 export interface IRequest extends Request{
-    loggedInUser:{user :Iuser,tokens:JwtPayload}
+    loggedInUser:{user :Iuser,token:JwtPayload}
+}
+export interface IBlackListedTokens extends Document{
+    tokenId:string;
+    expireAt:Date
 }

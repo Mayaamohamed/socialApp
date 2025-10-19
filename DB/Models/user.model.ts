@@ -2,7 +2,13 @@ import mongoose
 from "mongoose";
 import { RoleEnum, GenderEnum, ProviderEnum, otpTypesEnums } from "../../common/Enums/user.enum.js";
 import type { Iuser } from "../../common/Interfaces/user.interface.js";
- 
+import { generateHash } from "../../Utils/Encryption/hash.utils.js";
+import { encrypt } from "../../Utils/Encryption/crypto.utils.js";
+/**
+ * schema
+ * middleware
+ * model => once i called model so,schema is compiled/freezed means it doesn't updated
+ */
 
  const userSchema = new mongoose.Schema<Iuser>({
     firstName:{
@@ -57,5 +63,29 @@ email:{
    }]
 }
  })
+ // document middleware->save,validate, init, updateOne,deleteOne
+ userSchema.pre('save',async function(next){
+//console.log('pre saving user',this)
+ //this is doc here 
+ console.log(this.isModified("password"))
+ if(this.isModified("password")){ // password here is path/field
+    // hash 
+    this.password=generateHash(this.password as string)
+ }
+ if(this.isModified(this.phoneNumber)){
+    this.phoneNumber=encrypt(this.phoneNumber as string)
+ }
+next();
+})
+/**
+ * query middelware:
+ */
+userSchema.pre('findOne',function(){
+console.log(this.getQuery())
+})
+
+// لية لو حطيته بعد ال model مش هيشتغل
  const UserModel=mongoose.model<Iuser>('User',userSchema)
+
+
 export{UserModel}

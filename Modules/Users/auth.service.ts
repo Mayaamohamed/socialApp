@@ -1,15 +1,17 @@
 import type { NextFunction,Request,Response } from "express";
-import { otpTypesEnums, type Iuser } from "../../common/index.js";
+import { otpTypesEnums, type IRequest, type Iuser } from "../../common/index.js";
 import { UserRepository } from "../../DB/Repositories/user.repository.js";
 import { UserModel } from "../../DB/Models/user.model.js";
 import { encrypt } from "../../Utils/Encryption/crypto.utils.js";
 import { comapreHash, generateHash } from "../../Utils/Encryption/hash.utils.js";
 import { emitter } from "../../Utils/Services/email.utils.js";
 import { generateToken } from "../../Utils/Encryption/token.utils.js";
+import { BlackListedTokenRepository } from "../../DB/Repositories/black-listed-token.repository.js";
+import { BlackListedTokenModel } from "../../DB/Models/black-listed-models.js";
 
 class AuthService{
 private userRepo:UserRepository=new UserRepository(UserModel)
-
+private blackListedRepo:BlackListedTokenRepository=new BlackListedTokenRepository(BlackListedTokenModel)
     signUp= async (req:Request,res:Response,next:NextFunction)=>{
         const{firstName,lastName,email,password,gender,phoneNumber,DOB}: Partial<Iuser>=req.body
         // هو مش هيبعت كل الحاجات اللي فيه iuser 
@@ -105,5 +107,11 @@ if(!comparedPassword) {return res.status(401).json({message:'email or password i
 
   return res.status(200).json({ message: "Email confirmed successfully" });
 };
+
+logout=async (req:Request,res:Response)=>{
+  const{token:{jti,exp}}=(req as unknown as IRequest).loggedInUser
+  const blackListedToken=await this.blackListedRepo.createNewDocoumnt({tokenId:jti,expireAt:new Date(exp || Date.now()+600000)})
+  res.status(200).json({message:"user logged out successfully",data:{blackListedToken}})
+}
 }
 export default new AuthService()
